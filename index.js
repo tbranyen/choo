@@ -8,9 +8,9 @@ const sendAction = require('send-action')
 const mutate = require('xtend/mutable')
 const assert = require('assert')
 const xtend = require('xtend')
-const yo = require('yo-yo')
+const { createAttribute, html, element: diffElement } = require('diffhtml')
 
-choo.view = yo
+choo.view = html
 module.exports = choo
 
 // framework for creating sturdy web applications
@@ -109,12 +109,12 @@ function choo () {
 
         const newTree = _router(send.state().app.location, send.state(), send)
 
-        yo.update(oldTree, newTree)
+        diffElement(oldTree, newTree)
       })
     } else {
       rootId = name + '-root'
       const tree = _router(send.state().app.location, send.state(), send)
-      tree.setAttribute('id', rootId)
+      tree.attributes.push(createAttribute('id', rootId))
       return tree
     }
 
@@ -170,8 +170,8 @@ function choo () {
       const oldTree = document.querySelector('#' + rootId)
       assert.ok(oldTree, "Could not find DOM node '#" + rootId + "' to update")
       const newTree = _router(newState.app.location, newState, send, oldState)
-      newTree.setAttribute('id', rootId)
-      yo.update(oldTree, newTree)
+      newTree.attributes.push(createAttribute('id', rootId))
+      diffElement(oldTree, newTree)
     }
   }
 
